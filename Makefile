@@ -26,7 +26,7 @@ LIBFLAGS 		= -I ./libft -L ./libft -L . ./libft/*.c
 
 all:			libft_all ${NAME}
 $(NAME):		${OBJS} 
-				@$(CC) $(LIBFLAGS) libft/libft.a -I./ $(OBJS) -lncurses -o $@ 
+				@$(CC) $(LIBFLAGS) libft/libft.a -I./ $(OBJS) -ltermcap -o $@ 
 clean:			libft_clean
 				@${RM} ${OBJS}
 fclean:			libft_fclean clean
