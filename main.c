@@ -35,6 +35,28 @@ void		raw_term(void)
 	tcsetattr(0, TCSANOW, &term);
 }
 
+char **get_tab()
+{
+    int  fd;
+    char **str;
+    char *line;
+    char *line2;
+
+    str = NULL;
+    line = NULL;
+    line2 = ft_strdup("");
+    if ((fd = open("minishell_history.txt", O_RDONLY)) < 0)
+        return (NULL);
+    while (get_next_line3d(fd, &line) > 0)
+    {
+        line2 = ft_strjoin(line2, line);
+        line2 = ft_strjoin(line2, "\n");
+    }
+    str = ft_split(line2, '\n');
+//    printf("%s\n", line2);
+    return (str);
+}
+
 int main(int argc, char **argv)
 {
     char    *keyup;
@@ -43,6 +65,9 @@ int main(int argc, char **argv)
     int     fd;
     char    str[120];
     int     len;
+    int     i;
+    char    **history;
+    char    *tmp;
 
     (void)argc;
     (void)argv;
@@ -52,15 +77,22 @@ int main(int argc, char **argv)
     (void)len;
     (void)str;
     line = NULL;
+    i = 0;
+    tmp = NULL;
     ft_bzero(str, 0);
     raw_term();
 	if ((ret = ft_init_term()) == -1)
       	return (-1);
-//    keyup = key_up;
 	printf("START\n");
     while (1)
     {
 		line = ft_strdup("");
+        if ((history = get_tab()))
+        {
+            i = 0;
+            while (history[i])
+                i++;
+        }
 		tputs(save_cursor, 1, putchar);
         while ((len = read(0, str, 100)) != 0)
         {
@@ -69,15 +101,29 @@ int main(int argc, char **argv)
             { 
 				tputs(restore_cursor, 1, putchar);
 				tputs(tgetstr("ed", NULL), 1, putchar);
-				write(1, "UP", 3);
-				break ; 
+//				write(1, "UP", 3);
+                if (i != 0)
+                {
+                    i--;
+                    printf("%s\n", history[i]);
+                }
+//				break ; 
 			}	
             else if (!ft_strcmp(str, "\e[B"))
-            { 
+            {
+                tmp = line;
 				tputs(restore_cursor, 1, putchar);
 				tputs(tgetstr("ed", NULL), 1, putchar);
-				write(1, "DOWN", 5);
-				break ; 
+//				write(1, "DOWN", 5);               
+                if (history[i + 1])
+                {
+                    i++;
+                    printf("%s\n", history[i]);
+                }
+                else
+                    printf("%s\n", tmp);
+                
+//                break ;
 			}	
             else if (!ft_strcmp(str, "\e[D"))
 			{
