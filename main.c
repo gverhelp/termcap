@@ -1,5 +1,6 @@
 #include "include/test.h"
 #include <termios.h>
+#include <term.h>
 
 int ft_init_term()
 {
@@ -111,7 +112,7 @@ int main(int argc, char **argv)
                 if (i != 0)
                 {
                     i--;
-                    printf("%s\n", history[i]);
+                    ft_putstr(history[i]);
                 }
 //				break ; 
 			}	
@@ -127,7 +128,7 @@ int main(int argc, char **argv)
                 if (i + 1 < y)
                 {
                     i++;
-                    printf("%s\n", history[i]);
+                    ft_putstr(history[i]);
                 }
                 else if (tmp[0] != '\0')
                 {
@@ -136,10 +137,9 @@ int main(int argc, char **argv)
 				}
 //                break ;
 			}	
-            else if (!ft_strcmp(str, "\e[D"))
+            else if (!ft_strcmp(str, key_backspace))//!ft_strcmp(str, "\e[D"))
 			{
 				write(1, "DEL", 3);
-				tputs(restore_cursor, 1, putchar);
 				tputs(cursor_left, 1, putchar);
 				tputs(tgetstr("ed", NULL), 1, putchar);
 			}
