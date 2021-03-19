@@ -66,6 +66,8 @@ int main(int argc, char **argv)
     char    str[120];
     int     len;
     int     i;
+	int		a;
+    int     y;
     char    **history;
     char    *tmp;
 
@@ -78,7 +80,9 @@ int main(int argc, char **argv)
     (void)str;
     line = NULL;
     i = 0;
-    tmp = NULL;
+	y = 0;
+	a = 0;
+    tmp = ft_strdup("");
     ft_bzero(str, 0);
     raw_term();
 	if ((ret = ft_init_term()) == -1)
@@ -92,11 +96,13 @@ int main(int argc, char **argv)
             i = 0;
             while (history[i])
                 i++;
+			y = i;
         }
 		tputs(save_cursor, 1, putchar);
         while ((len = read(0, str, 100)) != 0)
         {
 //        printf("|%s|\n", str);
+    		tmp = ft_strdup("");
             if (!ft_strcmp(str, "\e[A"))
             { 
 				tputs(restore_cursor, 1, putchar);
@@ -111,18 +117,23 @@ int main(int argc, char **argv)
 			}	
             else if (!ft_strcmp(str, "\e[B"))
             {
-                tmp = line;
+                if (line[0] != '\0' && a == 0)
+				{
+					tmp = line;
+					a = 1;
+				}
 				tputs(restore_cursor, 1, putchar);
 				tputs(tgetstr("ed", NULL), 1, putchar);
-//				write(1, "DOWN", 5);               
-                if (history[i + 1])
+                if (i + 1 < y)
                 {
                     i++;
                     printf("%s\n", history[i]);
                 }
-                else
-                    printf("%s\n", tmp);
-                
+                else if (tmp[0] != '\0')
+                {
+					printf("\n%s", tmp);
+					a = 0;
+				}
 //                break ;
 			}	
             else if (!ft_strcmp(str, "\e[D"))
@@ -154,34 +165,6 @@ int main(int argc, char **argv)
         }
     }
     printf("|%s|\n", line);
-
-/*    while (get_next_line3d(STDIN_FILENO, &line) > 0)
-    {
-        if ((fd = open("minishell_history.txt", O_WRONLY |
-			O_APPEND | O_CREAT, 0644)) < 0)
-            return (-1);
-        if (line[0] != '\0')
-        {
-            write(fd, line, ft_strlen(line));
-            write(fd, "\n", 1);
-        }
-//        tputs(tgetstr("up", NULL), 1, ft_outc);
-    } */
     close(fd);
     return (ret);
 }
-
-
-
-//    keyup = tgetstr("ku", NULL);
-//    tputs(tgoto(keyup, 5, 5), 1, putchar);
-
-
-
-//    initscr();
-//    keypad(stdscr, TRUE);
-//    noecho();
-//    cbreak();
-//    while (getch() != 27)
-//    {
-//    }
