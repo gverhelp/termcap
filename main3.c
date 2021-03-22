@@ -137,7 +137,7 @@ int main(int argc, char **argv)
 				}
 //				write(1, "down", 4);
 			}	
-            else if (!ft_strcmp(str, "\eb"))//!ft_strcmp(str, "\e[D"))
+            else if (!ft_strcmp(str, key_backspace))
 			{
 				write(1, "DEL", 3);
 //				tputs(cursor_left, 1, putchar);

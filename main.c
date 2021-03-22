@@ -51,17 +51,27 @@ int     main(void)
     char    *line;
     char    *tmp;
     char    **history;
+    char    **add;
+    char    *fri;
+    int     flag;
 
+    (void)tmp;
+    (void)flag;
     len = 0;
     fd = 0;
     i = 0;
     y = 0;
     a = 0;
+    flag = 0;
     line = NULL;
     tmp = ft_strdup("");
     history = NULL;
     init_term();
     tputs(save_cursor, 1, ft_putchar2);
+    if ((fd = open("minishell_history.txt", O_WRONLY |
+			O_APPEND | O_CREAT, 0644)) < 0)
+            return (-1);
+    printf("START\n");
     while (1)
     {
         line = ft_strdup("");
@@ -77,50 +87,65 @@ int     main(void)
 //            printf("|%s|\n", str);
             if (!ft_strcmp(str, "\e[A"))
             {
-                tputs(restore_cursor, 1, ft_putchar2);
-                tputs(tgetstr("dl", NULL), 1, ft_putchar2);
-//                write(1, "UP", 2);
+                flag = 1;
+                if (a == 0)
+				{
+                    if (line[0] == '\0')
+                    {
+                        add = malloc(sizeof(char*) * 2);
+                        add[0] = ft_strdup("");
+                        add[1] = NULL;
+                    }
+                    else               
+                        add = ft_split(line, '\n');
+					history = ft_tabjoin(history, add);    
+                    y++;
+					a = 1;
+				}
                 if (i != 0)
                 {
                     i--;
+                    tputs(restore_cursor, 1, ft_putchar2);
+                    tputs(tgetstr("dl", NULL), 1, ft_putchar2);
                     ft_putstr(history[i]);
+                    line = ft_strdup(history[i]);
                 }
             }
             else if (!ft_strcmp(str, "\e[B"))
             {
-                if (line[0] != '\0' && a == 0)
-				{
-					tmp = line;
-					a = 1;
-				}
-                tputs(restore_cursor, 1, ft_putchar2);
-                tputs(tgetstr("dl", NULL), 1, ft_putchar2);
-//                write(1, "DOWN", 4);
+                flag = 1;
                 if (i + 1 < y)
                 {
                     i++;
+                    tputs(restore_cursor, 1, ft_putchar2);
+                    tputs(tgetstr("dl", NULL), 1, ft_putchar2);
                     ft_putstr(history[i]);
+                    line = ft_strdup(history[i]);
                 }
-                else if (tmp[0] != '\0')
-                {
-					printf("\n%s", tmp);
-					a = 0;
-				}
             }
-            else if (!ft_strcmp(str, "\n"))
+            else if (!ft_strcmp(str, "\n") || ((!ft_strcmp(str, "\n[A") || !ft_strcmp(str, "\n[B")) && flag == 1))
             {
+                
                 write(1, "\n", 1);
+                flag = 0;
+                a = 0;
                 break;
             }
-            else
+            else if (!ft_strcmp(str, key_backspace))
+			{
+                fri = ft_substr(line, 0, ft_strlen(line) - 1);
+                free(line);
+                line = ft_strdup(fri);
+                free(fri);
+				tputs(cursor_left, 1, ft_putchar2);
+				tputs(tgetstr("dc", NULL), 1, ft_putchar2);
+			}
+            else if (ft_strcmp(str, "\e[D") && ft_strcmp(str, "\e[C"))
             {
                 line = ft_strjoin(line, str);
                 write(1, str, len);
             }
         }
-        if ((fd = open("minishell_history.txt", O_WRONLY |
-			O_APPEND | O_CREAT, 0644)) < 0)
-            return (-1);
         if (line[0] != '\0')
         {
             write(fd, line, ft_strlen(line));
