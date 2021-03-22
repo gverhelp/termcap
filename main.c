@@ -54,15 +54,18 @@ int     main(void)
     char    **add;
     char    *fri;
     int     flag;
+    int     count;
 
     (void)tmp;
     (void)flag;
+    (void)count;
     len = 0;
     fd = 0;
     i = 0;
     y = 0;
     a = 0;
     flag = 0;
+    count = 0;
     line = NULL;
     tmp = ft_strdup("");
     history = NULL;
@@ -124,15 +127,15 @@ int     main(void)
                 }
             }
             else if (!ft_strcmp(str, "\n") || ((!ft_strcmp(str, "\n[A") || !ft_strcmp(str, "\n[B")) && flag == 1))
-            {
-                
+            {               
                 write(1, "\n", 1);
                 flag = 0;
                 a = 0;
                 break;
             }
-            else if (!ft_strcmp(str, key_backspace))
+            else if (!ft_strcmp(str, key_backspace))// || (!ft_strcmp(str, "[A")) || (!ft_strcmp(str, "[B")))
 			{
+                printf("OK\n");
                 fri = ft_substr(line, 0, ft_strlen(line) - 1);
                 free(line);
                 line = ft_strdup(fri);
