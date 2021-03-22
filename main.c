@@ -70,7 +70,7 @@ int     main(void)
     tmp = ft_strdup("");
     history = NULL;
     init_term();
-    tputs(save_cursor, 1, ft_putchar2);
+//    tputs(save_cursor, 1, ft_putchar2);
     if ((fd = open("minishell_history.txt", O_WRONLY |
 			O_APPEND | O_CREAT, 0644)) < 0)
             return (-1);
@@ -108,9 +108,9 @@ int     main(void)
                 if (i != 0)
                 {
                     i--;
-                    tputs(restore_cursor, 1, ft_putchar2);
+//                    tputs(restore_cursor, 1, ft_putchar2);
                     tputs(tgetstr("dl", NULL), 1, ft_putchar2);
-                    ft_putstr(history[i]);
+                    tputs(history[i], 1, ft_putchar2);
                     line = ft_strdup(history[i]);
                 }
             }
@@ -120,9 +120,9 @@ int     main(void)
                 if (i + 1 < y)
                 {
                     i++;
-                    tputs(restore_cursor, 1, ft_putchar2);
+//                    tputs(restore_cursor, 1, ft_putchar2);
                     tputs(tgetstr("dl", NULL), 1, ft_putchar2);
-                    ft_putstr(history[i]);
+                    tputs(history[i], 1, ft_putchar2);
                     line = ft_strdup(history[i]);
                 }
             }
@@ -135,7 +135,6 @@ int     main(void)
             }
             else if (!ft_strcmp(str, key_backspace))// || (!ft_strcmp(str, "[A")) || (!ft_strcmp(str, "[B")))
 			{
-                printf("OK\n");
                 fri = ft_substr(line, 0, ft_strlen(line) - 1);
                 free(line);
                 line = ft_strdup(fri);
