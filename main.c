@@ -1,6 +1,19 @@
 #include "include/test.h"
 #include <termios.h>
-#include <term.h>
+
+void		raw_term(void)
+{
+	t_termios		term;
+    t_termios       term_backup;
+
+	tcgetattr(0, &term);
+    tcgetattr(0, &term_backup);
+	term.c_lflag &= ~(ICANON);
+	term.c_lflag &= ~(ECHO);
+    term.c_cc[VMIN] = 1;
+    term.c_cc[VTIME] = 0;
+	tcsetattr(0, TCSANOW, &term);
+}
 
 int ft_init_term()
 {
@@ -13,6 +26,7 @@ int ft_init_term()
         return (-1);
     }
     ret = tgetent(NULL, term_type);
+    raw_term();
     if (ret == 0)
     {
         printf("Pas assez d'infos\n");
@@ -24,16 +38,6 @@ int ft_init_term()
         return (-1);
     }
     return (0);
-}
-
-void		raw_term(void)
-{
-	t_termios		term;
-
-	tcgetattr(0, &term);
-	term.c_lflag &= ~(ECHO);
-	term.c_lflag &= ~(ICANON);
-	tcsetattr(0, TCSANOW, &term);
 }
 
 char **get_tab()
@@ -60,7 +64,6 @@ char **get_tab()
 
 int main(int argc, char **argv)
 {
-    char    *keyup;
     char    *line;
     int     ret;
     int     fd;
@@ -76,7 +79,6 @@ int main(int argc, char **argv)
     (void)argv;
     (void)line;  
     (void)fd; 
-    (void)keyup;
     (void)len;
     (void)str;
     line = NULL;
@@ -85,10 +87,9 @@ int main(int argc, char **argv)
 	a = 0;
     tmp = ft_strdup("");
     ft_bzero(str, 0);
-    raw_term();
 	if ((ret = ft_init_term()) == -1)
       	return (-1);
-	printf("START\n");
+	write(1, "START\n", 6);
     while (1)
     {
 		line = ft_strdup("");
@@ -99,22 +100,21 @@ int main(int argc, char **argv)
                 i++;
 			y = i;
         }
-		tputs(save_cursor, 1, putchar);
         while ((len = read(0, str, 100)) != 0)
         {
-//        printf("|%s|\n", str);
+            printf("|%s|", str);
     		tmp = ft_strdup("");
+            tputs(save_cursor, 1, putchar);
             if (!ft_strcmp(str, "\e[A"))
-            { 
-				tputs(restore_cursor, 1, putchar);
-				tputs(tgetstr("ed", NULL), 1, putchar);
-//				write(1, "UP", 3);
+            {
+//				tputs(restore_cursor, 1, putchar);
+//				tputs(tgetstr("ed", NULL), 1, putchar);
+//				write(1, "UP", 2);
                 if (i != 0)
                 {
                     i--;
                     ft_putstr(history[i]);
-                }
-//				break ; 
+                } 
 			}	
             else if (!ft_strcmp(str, "\e[B"))
             {
@@ -123,8 +123,8 @@ int main(int argc, char **argv)
 					tmp = line;
 					a = 1;
 				}
-				tputs(restore_cursor, 1, putchar);
-				tputs(tgetstr("ed", NULL), 1, putchar);
+//				tputs(restore_cursor, 1, putchar);
+//				tputs(tgetstr("ed", NULL), 1, putchar);
                 if (i + 1 < y)
                 {
                     i++;
@@ -135,16 +135,17 @@ int main(int argc, char **argv)
 					printf("\n%s", tmp);
 					a = 0;
 				}
-//                break ;
+//				write(1, "down", 4);
 			}	
             else if (!ft_strcmp(str, key_backspace))//!ft_strcmp(str, "\e[D"))
 			{
 				write(1, "DEL", 3);
-				tputs(cursor_left, 1, putchar);
-				tputs(tgetstr("ed", NULL), 1, putchar);
+//				tputs(cursor_left, 1, putchar);
+//				tputs(tgetstr("ed", NULL), 1, putchar);
 			}
             else if (!ft_strcmp(str, "\n"))
         	{
+                write(1, "OK", 2);
 				write(1, "\n", 1);
 				break ;
 			}
@@ -164,7 +165,7 @@ int main(int argc, char **argv)
             write(fd, "\n", 1);
         }
     }
-    printf("|%s|\n", line);
+//    printf("|%s|\n", line);
     close(fd);
     return (ret);
 }
