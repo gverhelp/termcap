@@ -32,7 +32,7 @@ char **get_tab()
     str = NULL;
     line = NULL;
     line2 = ft_strdup("");
-    if ((fd = open("minishell_history.txt", O_RDONLY)) < 0)
+    if ((fd = open(".minishell_history.txt", O_RDONLY)) < 0)
         return (NULL);
     while (get_next_line3d(fd, &line) > 0)
     {
@@ -47,7 +47,7 @@ char **get_tab()
     free(line);
     str = ft_split(line2, '\n');
     free(line2);
-//    printf("%s\n", line2);
+    close(fd);
     return (str);
 }
 
@@ -78,11 +78,10 @@ int     main(void)
     line = NULL;
     history = NULL;
     init_term();
-//    tputs(save_cursor, 1, ft_putchar2);
-    if ((fd = open("minishell_history.txt", O_WRONLY |
+    if ((fd = open(".minishell_history.txt", O_WRONLY |
 			O_APPEND | O_CREAT, 0644)) < 0)
             return (-1);
-    printf("START\n");
+//    printf("START\n");
     while (1)
     {
         line = ft_strdup("");
@@ -93,9 +92,10 @@ int     main(void)
                 i++;
 			y = i;
         }
+//        tputs(save_cursor, 1, ft_putchar2);
         while ((len = read(0, str, 100)) != 0)
         {
-//            printf("%s\n", str);
+            str[len] = 0;
             if (!ft_strcmp(str, "\e[A"))
             {
                 flag = 1;
@@ -141,7 +141,7 @@ int     main(void)
                 a = 0;
                 break;
             }
-            else if (!ft_strcmp(str, key_backspace)) // || (!ft_strcmp(str, "[A")) || (!ft_strcmp(str, "[B")))
+            else if (!ft_strcmp(str, key_backspace))
 			{
                 fri = ft_substr(line, 0, ft_strlen(line) - 1);
                 free(line);
@@ -150,7 +150,7 @@ int     main(void)
 				tputs(cursor_left, 1, ft_putchar2);
 				tputs(tgetstr("dc", NULL), 1, ft_putchar2);
 			}
-            else if (ft_strcmp(str, "\e[D") && ft_strcmp(str, "\e[C"))
+            else// (ft_strcmp(str, "\e[D") && ft_strcmp(str, "\e[C"))
             {
                 fri = line;
                 line = ft_strjoin(line, str);
@@ -158,13 +158,12 @@ int     main(void)
                 write(1, str, len);
             }
         }
-//        write(1, "OK", 2);
         if (line[0] != '\0')
         {
             write(fd, line, ft_strlen(line));
             write(fd, "\n", 1);
         }
-//        printf("OK\n");
     }
+    close(fd);
     return (0);
 }
