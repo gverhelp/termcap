@@ -9,16 +9,13 @@ int	ft_putchar2(int c)
 void    init_term(void)
 {
     t_termios		term;
-    t_termios       term_backup;
+//    t_termios       term_backup;
 
-    tgetent(0, getenv("TERM"));
-	tcgetattr(0, &term);
-	tcgetattr(0, &term_backup);
-	term.c_lflag = term.c_lflag & ~ICANON;
-	term.c_lflag = term.c_lflag & ~ECHO;
-	term.c_cc[VMIN] = 1;
-	term.c_cc[VTIME] = 0;
-	tcsetattr(0, TCSANOW, &term);  
+    tcgetattr(0, &term);
+    term.c_lflag &= ~(ICANON);
+    term.c_lflag &= ~(ECHO);
+    tcsetattr(0, TCSANOW, &term);
+    tgetent(0, getenv("TERM"));  
 }
 
 char **get_tab()
