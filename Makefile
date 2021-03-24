@@ -1,6 +1,8 @@
 NAME 			= test
 LIBFT_PATH 		= ./libft
-SRCS 			= main.c
+SRCS 			= main.c \
+					what_key.c \
+					utils_termcap.c
 
 OBJS			= ${SRCS:.c=.o}
 INCLUDE 		= include/test.h
